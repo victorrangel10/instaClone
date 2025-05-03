@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   PerfilContainer,
   ProfileHeader,
@@ -8,49 +8,73 @@ import {
 } from './styles'
 
 // Importe aqui o componente Post, que você já tem
-import {Post} from '../../components/Post'
+import { Post } from '../../components/Post'
 import { TitleBar } from '../../components/TitleBar'
+import { useQuery } from '@tanstack/react-query'
+import { getProfile } from '../../api/get-profile'
+import { getUserPosts, UserPost } from '../../api/get-user-posts';
+
 export function Perfil() {
-  // Exemplo: simulando 9 posts de placeholders
-  const posts = Array.from({ length: 9 }, (_, i) => ({
-    id: i + 1,
-    profileName: 'profile_name',
-    avatarUrl: '',     // Se quiser exibir um avatar no próprio Post
-    date: '23/11/2024',
-    imageUrl: '',      // Se vazio, o Post mostrará o placeholder "Foto"
-    description: 'Lorem ipsum dolor sit amet.'
-  }))
+  const [userPosts, setUserPosts] = useState<UserPost[]>([]);
+
+  const { data: profile1 } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile
+  })
+
+  const profile = profile1?.user;
+
+  console.log('Perfil ofc:', profile);
+  useEffect(() => {
+    async function fetchUserPosts() {
+      if (profile?.id) {
+      // Verifique se o ID está correto
+        try {
+          console.log('ID do perfil:', profile.id); 
+          const posts = await getUserPosts(profile.id);
+          setUserPosts(posts);
+          console.log('Posts do usuário:', posts);  
+        } catch (error) {
+          console.error('Erro ao buscar os posts do usuário:', error);
+        }
+      }
+    }
+
+    fetchUserPosts();
+  }, [profile]);
+
+
 
   return (
     <div>
-    <TitleBar text="Meu perfil" />
-    <PerfilContainer>
-      <ProfileHeader>
-        <ProfileAvatar
-          src="https://via.placeholder.com/120x120.png?text=Perfil" 
-          alt="Foto de Perfil"
-        />
-        <DescriptionContainer>
-          <h2>Foto de Perfil</h2>
-          <p>Descrição (max: 180 caracteres)</p>
-          <p>OBS: Desconsiderar borda</p>
-        </DescriptionContainer>
-      </ProfileHeader>
-
-      {/* Grade de posts */}
-      <PostsGrid>
-        {posts.map(post => (
-          <Post
-            key={post.id}
-            profileName={post.profileName}
-            avatarUrl={post.avatarUrl}
-            date={post.date}
-            imageUrl={post.imageUrl}
-            description={post.description}
+      <TitleBar text="Meu perfil" />
+      <PerfilContainer>
+        <ProfileHeader>
+          <ProfileAvatar
+            src={`http://localhost:3333/${profile?.profileImage}`}
+            alt={'${profile.name}'}
           />
-        ))}
-      </PostsGrid>
-    </PerfilContainer>
+          <DescriptionContainer>
+            <h2>{profile?.name}</h2>
+            <p>bio do instagram bla bla bla </p>
+          </DescriptionContainer>
+        </ProfileHeader>
+
+        {/* Grade de posts */}
+        <PostsGrid>
+          {userPosts.map((post) => (
+            <Post
+              key={post.id}
+              postId={post.id}
+              profileName={profile?.name || 'Usuário'}
+              avatarUrl={`http://localhost:3333/${profile?.profileImage}`}
+              date={new Date(post.date).toLocaleDateString()}
+              imageUrl={`http://localhost:3333/${post.postImage}`}
+              description={post.description || 'Sem descrição'}
+            />
+          ))}
+        </PostsGrid>
+      </PerfilContainer>
     </div>
   )
 }

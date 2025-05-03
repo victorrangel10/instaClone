@@ -3,6 +3,8 @@ import styled from 'styled-components'
 /* Contêiner geral do perfil */
 export const PerfilContainer = styled.div`
   width: 100%;
+  max-width: 1200px; /* Define uma largura máxima para o conteúdo */
+  margin: 0 auto; /* Centraliza horizontalmente */
   padding: 2rem;
   /* Ajuste se quiser centralizar ou criar margens, 
      lembrando que o layout pai já tem sidebar e título */
@@ -38,17 +40,25 @@ export const DescriptionContainer = styled.div`
   }
 `
 
-/* Grade de Posts (3 colunas) */
+/* Grade de Posts */
 export const PostsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 colunas */
-  gap: 1rem; /* Espaço entre as colunas e as linhas */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsivo */
+  gap: 1.5rem; /* Espaço entre os posts */
+  width: 100%; /* Garante que a grade não ultrapasse a largura do contêiner */
+  align-items: start; /* Garante alinhamento consistente dos itens */
+  margin-top: 2rem; /* Espaço entre o cabeçalho e os posts */
+`;
 
-  /* Responsividade simples */
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
-`
+/* Estilo para cada Post */
+export const PostContainer = styled.div`
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* Garante que o post ocupe todo o espaço disponível */
+`;

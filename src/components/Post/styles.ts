@@ -5,10 +5,26 @@ export const PostContainer = styled.div`
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   border-radius: 8px;
-  width: 600px;
+  width: auto;
+  max-width: 600px;    /* Largura máxima para o post */
+  overflow: hidden; /* Evita que conteúdo extrapole bordas arredondadas */
   margin: 1.5rem auto;  /* Centraliza horizontalmente ao usar display block */
   overflow: hidden;     /* Evita que conteúdo extrapole bordas arredondadas */
+  justify-content: space-between; /* Espaça o conteúdo uniformemente */
+   height: 550px; /* Altura fixa para todos os posts */
 `
+
+
+export const TrashIcon = styled.div`
+  cursor: pointer;
+  font-size: 1.5rem;  
+`
+
+export const EllipsisMenu = styled.div` 
+  cursor: pointer;
+  font-size: 1.5rem;  
+  margin-left: auto; /* Adiciona margem à esquerda para empurrar o menu para a direita */
+` 
 
 // Cabeçalho do Post: avatar, nome e data
 export const PostHeader = styled.div`

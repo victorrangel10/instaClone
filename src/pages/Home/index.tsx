@@ -1,62 +1,53 @@
-
+import React, { useEffect, useState } from "react";
 import { Post } from "../../components/Post";
 import { TitleBar } from "../../components/TitleBar";
+import { getPosts, Post as PostType } from "../../api/get-posts";
+import { getUserById, User } from "../../api/get-user-by-id";
+
 export function Home() {
-    return (
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [userProfiles, setUserProfiles] = useState<Record<string, User>>({});
 
-        <div>
-         <TitleBar text="Últimas fotos" />
+  useEffect(() => {
+    async function fetchPostsAndUsers() {
+      try {
+        const postsData = await getPosts();
+        setPosts(postsData);
 
-            <Post
-                profileName="profile_name"
-                avatarUrl="caminho/para/avatar.jpg"
-                date="23/11/2024"
-                imageUrl="caminho/para/foto-do-post.jpg"
-                description="Lorem ipsum dolor sit amet..."
-            />
-            <Post
-                profileName="profile_name"
-                avatarUrl="caminho/para/avatar.jpg"
-                date="23/11/2024"
-                imageUrl="caminho/para/foto-do-post.jpg"
-                description="Lorem ipsum dolor sit amet..."
-            />
+        const userIds = [...new Set(postsData.map((post) => post.USER_ID))];
+        const profiles: Record<string, User> = {};
 
-            <Post
-                profileName="profile_name"
-                avatarUrl="caminho/para/avatar.jpg"
-                date="23/11/2024"
-                imageUrl="caminho/para/foto-do-post.jpg"
-                description="Lorem ipsum dolor sit amet..."
-            />
+        for (const userId of userIds) {
+          const userProfile = await getUserById(userId);
+          profiles[userId] = userProfile.user;
+        }
 
-            <Post
-                profileName="profile_name"
-                avatarUrl="caminho/para/avatar.jpg"
-                date="23/11/2024"
-                imageUrl="caminho/para/foto-do-post.jpg"
-                description="Lorem ipsum dolor sit amet..."
-            />
+        setUserProfiles(profiles);
+      } catch (error) {
+        console.error("Erro ao buscar os posts ou perfis dos usuários:", error);
+      }
+    }
 
-            <Post
-                profileName="profile_name"
-                avatarUrl="caminho/para/avatar.jpg"
-                date="23/11/2024"
-                imageUrl="caminho/para/foto-do-post.jpg"
-                description="Lorem ipsum dolor sit amet..."
-            />
+    fetchPostsAndUsers();
+  }, []);
 
-            <Post
-                profileName="profile_name"
-                avatarUrl="caminho/para/avatar.jpg"
-                date="23/11/2024"
-                imageUrl="caminho/para/foto-do-post.jpg"
-                description="Lorem ipsum dolor sit amet..."
-            />
-
-
-
-
-        </div>
-    )
+  return (
+    <div>
+      <TitleBar text="Últimas fotos" />
+      {posts.map((post) => {
+        const userProfile = userProfiles[post.USER_ID];
+        console.log(userProfile);
+        return (
+          <Post
+            key={post.id}
+            profileName={userProfile?.name || "Usuário desconhecido"}
+            avatarUrl={`http://localhost:3333/${userProfile?.profileImage}`}
+            date={new Date(post.date).toLocaleDateString()}
+            imageUrl={`http://localhost:3333/${post.postImage}`}
+            description={post.description || "Sem descrição"}
+          />
+        );
+      })}
+    </div>
+  );
 }
